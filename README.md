@@ -1,5 +1,5 @@
-# deadchatxd
-dead chat xd is a Discord bot that will send a "dead chat xd" meme gif if a channel is inactive for a certain amount of time.
+d# deadchatxdd
+dead chat xdd is a Discord bot that will send a "dead chat xd" meme gif if a channel is inactive for a certain amount of time.
 
 [Invite me to your server](https://discord.com/api/oauth2/authorize?client_id=747345374309777428&permissions=379904&scope=bot)
 
