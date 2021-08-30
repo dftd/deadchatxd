@@ -5,11 +5,17 @@
 
 'use strict';
 
+require('dotenv').config();
+
 const Discord = require('discord.js');
 const mysql = require('mysql');
 const DBL = require('dblapi.js');
 const client = new Discord.Client();
-const dbl = new DBL(process.env.DBL_TOKEN, client);
+const Tenor = require('tenorjs').client({ Key: process.env.TENOR, Locale: 'en_US', Filter: 'off' }); // Uppercase prop, really?!
+
+if(process.env.DBL_TOKEN) {
+    const dbl = new DBL(process.env.DBL_TOKEN, client);
+}
 
 // const gifRegex = /dead_chat_xd/g;
 const cmdRegex = /(help|query|enable|disable|edit)/g;
@@ -36,13 +42,15 @@ const helpEmbed = {
     ],
 };
 
-// DBL API for top.gg
-dbl.on('posted', ()=>{
-    console.log("Server count posted to top.gg");
-})
-dbl.on('error', error => {
-    console.error("top.gg error:", error);
-})
+if(process.env.DBL_TOKEN) {
+    // DBL API for top.gg
+    dbl.on('posted', ()=>{
+        console.log("Server count posted to top.gg");
+    })
+    dbl.on('error', error => {
+        console.error("top.gg error:", error);
+    })
+}
 
 var pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -57,32 +65,11 @@ pool.on('release', function() {
 
 function sendImg(chId) {
     client.channels.fetch(chId).then(channel => {
-        switch (Math.floor(Math.random() * 9)) {
-            case 0:
-                channel.send("https://cdn.discordapp.com/attachments/366776253124050947/747767766467084288/dead_chat_xd_2.gif");
-                break;
-            case 1:
-                channel.send("https://tenor.com/view/dead-chat-gif-18800792"); // 3
-                break;
-            case 2:
-                channel.send("https://cdn.discordapp.com/attachments/366776253124050947/752805605583880192/dead_chat_xd_4.gif");
-                break;
-            case 3:
-                channel.send("https://cdn.discordapp.com/attachments/671076353944059905/758165638387728434/dead_chat_xd_5.gif");
-                break;
-            case 4:
-                channel.send("https://cdn.discordapp.com/attachments/366776253124050947/759711661468155914/dead_chat_xd_6.gif");
-                break;
-            case 5:
-                channel.send("https://tenor.com/view/dead-chat-xd-gif-19206088"); // 7
-                break;
-            case 6:
-                channel.send("https://cdn.discordapp.com/attachments/671076353944059905/802811004828123136/dead_chat_xd_8.gif");
-                break;
-            default:
-                channel.send("https://cdn.discordapp.com/attachments/366776253124050947/747354851570090004/dead_chat_xd.gif");
-                break;
-        }
+        Tenor.Search.random('dead chat xd', 1).then(gifs => {
+            (gifs.results).forEach(gif => {
+                channel.send(gif.url);
+            });
+        }).catch(console.error);
     })
     .catch(error => {
         console.error(error);
